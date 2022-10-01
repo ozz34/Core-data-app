@@ -22,7 +22,6 @@ class TaskListViewController: UITableViewController {
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
         setupNavigationBar()
-        fetchData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -60,13 +59,13 @@ class TaskListViewController: UITableViewController {
     }
     
     @objc private func addNewTask() {
-        let newTaskVC = TaskViewController()
-        newTaskVC.modalPresentationStyle = .fullScreen
+       // let newTaskVC = TaskViewController()
+       // newTaskVC.modalPresentationStyle = .fullScreen
         showAlert(with: "New task", and: "What do you want to do")
     }
     
     private func fetchData() {
-        let fetchRequest = try Task.fetchRequest()
+        let fetchRequest = Task.fetchRequest()
         
         do {
             taskList = try context.fetch(fetchRequest)
