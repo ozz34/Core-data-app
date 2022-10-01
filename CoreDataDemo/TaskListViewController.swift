@@ -8,6 +8,10 @@
 import UIKit
 import CoreData
 
+protocol TaskViewControllerDelegate {
+    func reloadData()
+}
+
 class TaskListViewController: UITableViewController {
     
     private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -25,10 +29,10 @@ class TaskListViewController: UITableViewController {
         fetchData()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        fetchData()
-        tableView.reloadData()
-    }
+//    override func viewWillAppear(_ animated: Bool) {
+//        fetchData()
+//        tableView.reloadData()
+//    }
     
     private func setupNavigationBar() {
         title = " Task List"
@@ -61,7 +65,8 @@ class TaskListViewController: UITableViewController {
     
     @objc private func addNewTask() {
         let newTaskVC = TaskViewController()
-        newTaskVC.modalPresentationStyle = .fullScreen
+        newTaskVC.delegate = self
+        //newTaskVC.modalPresentationStyle = .fullScreen
         present(newTaskVC, animated: true)
     }
     
@@ -89,5 +94,12 @@ extension TaskListViewController {
         cell.contentConfiguration = content
         
         return cell
+    }
+}
+
+extension TaskListViewController: TaskViewControllerDelegate {
+    func reloadData() {
+        fetchData()
+        tableView.reloadData()
     }
 }
