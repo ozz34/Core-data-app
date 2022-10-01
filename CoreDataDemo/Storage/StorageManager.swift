@@ -10,6 +10,10 @@ import CoreData
 
 class StorageManager {
     
+    static let shared = StorageManager()
+    
+    var taskList: [Task] = []
+    
     // MARK: - Core Data stack
     lazy var persistentContainer: NSPersistentContainer = {
 
@@ -22,24 +26,36 @@ class StorageManager {
         })
         return container
     }()
+
+    private let context: NSManagedObjectContext?
     
-    let context: NSManagedObjectContext
-    
-//    init() {
-//        self.context = self.persistentContainer.viewContext
-//    }
+    private init() {
+        context = persistentContainer.viewContext
+    }
     
     // MARK: - Core Data Saving support
-    func saveContext () {
-        let context = persistentContainer.viewContext
+    func saveContext(_ taskName: String) {
+        let task = Task(context: context)
+        task.name = taskName
+        taskList.append(task)
+        
         if context.hasChanges {
             do {
-                try context.save()
+                try context?.save()
             } catch {
-               
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
     }
+    
+    func fetchData() {
+        let fetchRequest = Task.fetchRequest()
+        do {
+            taskList = try context?.fetch(fetchRequest)
+        } catch {
+            print("failed")
+        }
+    }
 }
+
