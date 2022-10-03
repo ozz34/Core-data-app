@@ -12,7 +12,7 @@ class StorageManager {
     
     static let shared = StorageManager()
     
-    var taskList: [Task] = []
+    lazy var context = StorageManager.shared.persistentContainer.viewContext
     
     // MARK: - Core Data stack
     lazy var persistentContainer: NSPersistentContainer = {
@@ -27,35 +27,46 @@ class StorageManager {
         return container
     }()
 
-    private let context: NSManagedObjectContext?
-    
-    private init() {
-        context = persistentContainer.viewContext
-    }
+    private init() {}
     
     // MARK: - Core Data Saving support
-    func saveContext(_ taskName: String) {
-        let task = Task(context: context)
-        task.name = taskName
-        taskList.append(task)
-        
+    func saveContext () {
         if context.hasChanges {
             do {
-                try context?.save()
+                try context.save()
             } catch {
+
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
     }
-    
-    func fetchData() {
+
+    func fetchData(completion: @escaping(Result<[Task],Error>) -> Void) {
         let fetchRequest = Task.fetchRequest()
         do {
-            taskList = try context?.fetch(fetchRequest)
-        } catch {
-            print("failed")
+            let taskData = try context.fetch(fetchRequest)
+            completion(.success(taskData))
+        } catch let error {
+            completion(.failure(error))
         }
+    }
+
+    func save(_ taskName: String, completion: (Task) -> Void) {
+        let task = Task(context: context)
+        task.name = taskName
+        completion(task)
+        saveContext()
+    }
+    
+    func delete(_ task: Task) {
+        context.delete(task)
+        saveContext()
+    }
+    
+    func edit(_ task: Task, newName: String) {
+        task.name = newName
+        saveContext()
     }
 }
 
