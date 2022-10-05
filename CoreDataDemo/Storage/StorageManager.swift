@@ -12,10 +12,10 @@ class StorageManager {
     
     static let shared = StorageManager()
     
-    lazy var context = StorageManager.shared.persistentContainer.viewContext
+    private lazy var context = StorageManager.shared.persistentContainer.viewContext
     
     // MARK: - Core Data stack
-    lazy var persistentContainer: NSPersistentContainer = {
+    private var persistentContainer: NSPersistentContainer = {
 
         let container = NSPersistentContainer(name: "CoreDataDemo")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
