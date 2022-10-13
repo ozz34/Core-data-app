@@ -93,8 +93,8 @@ extension TaskListViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let task = taskList[indexPath.row]
-        showAlert(with: "Edit", and: "New Name") { name in
-            StorageManager.shared.edit(task, newName: name)
+        showAlert(with: "Edit", and: "New Name") { newName in
+            StorageManager.shared.edit(task, newName: newName)
             tableView.reloadRows(at: [indexPath], with: .automatic)
         }
     }
@@ -104,8 +104,8 @@ extension TaskListViewController {
     private func showAlert(with title: String, and message: String,  completion: @escaping(String) -> Void) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
-            guard let task = alert.textFields?.first?.text, !task.isEmpty else { return }
-            completion(task)
+            guard let newName = alert.textFields?.first?.text, !newName.isEmpty else { return }
+            completion(newName)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
         alert.addAction(saveAction)
