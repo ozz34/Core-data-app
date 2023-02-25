@@ -14,10 +14,15 @@ class TaskListViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         view.backgroundColor = .white
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
         setupNavigationBar()
+        fetch()
+    }
+    
+    
+    private func fetch() {
         StorageManager.shared.fetchData {[weak self] result in
             switch result {
             case .success(let tasks):
