@@ -7,21 +7,33 @@
 
 import UIKit
 
-class TaskListViewController: UITableViewController {
+final class TaskListViewController: UITableViewController {
+    // MARK: - Properties
+    var taskList: [Task] = []
     
     private let cellID = "task"
-    var taskList: [Task] = []
-
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = .white
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
         setupNavigationBar()
         fetch()
     }
     
+    // MARK: - Actions
+    @objc private func addNewTask() {
+        showAlert(with: "New task", and: "What do you want to do") { name in
+            StorageManager.shared.save(name) { task in
+                self.taskList.append(task)
+                let cellIndex = IndexPath(row: self.taskList.count - 1, section: 0)
+                self.tableView.insertRows(at: [cellIndex], with: .automatic)
+            }
+        }
+    }
     
+    // MARK: - Helpers
     private func fetch() {
         StorageManager.shared.fetchData {[weak self] result in
             switch result {
@@ -59,24 +71,16 @@ class TaskListViewController: UITableViewController {
             action: #selector(addNewTask)
         )
     }
-    
-    @objc private func addNewTask() {
-        showAlert(with: "New task", and: "What do you want to do") { name in
-            StorageManager.shared.save(name) { task in
-                self.taskList.append(task)
-                let cellIndex = IndexPath(row: self.taskList.count - 1, section: 0)
-                self.tableView.insertRows(at: [cellIndex], with: .automatic)
-            }
-        }
-    }
 }
 
+// MARK: - UITableViewDataSource
 extension TaskListViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         taskList.count
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView,
+                            cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
         let task = taskList[indexPath.row]
         var content = cell.defaultContentConfiguration()
@@ -105,6 +109,7 @@ extension TaskListViewController {
     }
 }
 
+// MARK: - Show alert
 extension TaskListViewController {
     private func showAlert(with title: String, and message: String,  completion: @escaping(String) -> Void) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)

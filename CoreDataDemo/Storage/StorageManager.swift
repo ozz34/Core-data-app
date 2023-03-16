@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-class StorageManager {
+final class StorageManager {
     
     static let shared = StorageManager()
     
@@ -69,4 +69,3 @@ class StorageManager {
         saveContext()
     }
 }
-
